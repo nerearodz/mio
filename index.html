@@ -10,17 +10,26 @@
       background-color: #ffffff;
       color: black;
       text-align: center;
-      overflow-x: hidden;
       margin: 0;
-      padding: 20px;
+      padding: 5px;
+      overflow: hidden;
+    }
+
+    .wrapper {
+      width: 300px;
+      height: 350px;
+      margin: auto;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      position: relative;
     }
 
     .table-container {
       position: relative;
       display: flex;
       justify-content: center;
-      gap: 200px;
-      margin-top: 30px;
+      gap: 30px; /* reducido */
+      margin-top: 10px;
     }
 
     table {
@@ -32,38 +41,37 @@
     }
 
     td {
-      width: 100px;
-      height: 80px;
-      background-color: white; /* Fondo blanco */
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      font-size: 24px;
+      width: 60px;
+      height: 40px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
       text-align: center;
       vertical-align: middle;
       cursor: pointer;
       user-select: none;
       position: relative;
-      transition: background-color 0.3s, border-color 0.3s;
     }
 
     td.selected {
-      border: 3px solid yellow;
+      border: 2px solid yellow;
     }
 
     #verify {
-      margin-top: 30px;
-      padding: 10px 20px;
+      margin-top: 10px;
+      padding: 5px 10px;
       background-color: #0989a8;
       color: white;
-      font-size: 18px;
+      font-size: 14px;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
     }
 
     #mensaje {
-      margin-top: 20px;
-      font-size: 22px;
+      margin-top: 5px;
+      font-size: 14px;
       font-weight: bold;
     }
 
@@ -80,28 +88,28 @@
 </head>
 <body>
 
-  <div class="table-container">
-    <svg id="lines"></svg>
+  <div class="wrapper">
+    <div class="table-container">
+      <svg id="lines"></svg>
 
-    <table id="colA">
-      <tr><th>Columna A</th></tr>
-      <tr><td id="A1">18/30</td></tr>
-      <tr><td id="A2">3/5</td></tr>
-      <tr><td id="A3">6/8</td></tr>
-      <tr><td id="A4">1/2</td></tr>
-    </table>
+      <table id="colA">
+        <tr><td id="A1">18/30</td></tr>
+        <tr><td id="A2">3/5</td></tr>
+        <tr><td id="A3">6/8</td></tr>
+        <tr><td id="A4">1/2</td></tr>
+      </table>
 
-    <table id="colB">
-      <tr><th>Columna B</th></tr>
-      <tr><td id="B1">5/10</td></tr>
-      <tr><td id="B2">3/4</td></tr>
-      <tr><td id="B3">6/10</td></tr>
-      <tr><td id="B4">9/15</td></tr>
-    </table>
+      <table id="colB">
+        <tr><td id="B1">5/10</td></tr>
+        <tr><td id="B2">3/4</td></tr>
+        <tr><td id="B3">6/10</td></tr>
+        <tr><td id="B4">9/15</td></tr>
+      </table>
+    </div>
+
+    <button id="verify" onclick="verificarRespuesta()">Verificar</button>
+    <div id="mensaje"></div>
   </div>
-
-  <button id="verify" onclick="verificarRespuesta()">Verificar</button>
-  <div id="mensaje"></div>
 
   <script>
     let seleccionA = null;
@@ -111,9 +119,8 @@
     const celdasA = document.querySelectorAll("#colA td");
     const celdasB = document.querySelectorAll("#colB td");
 
-    // Colores para líneas: verde y rojo
-    const colorCorrecto = "#4caf50"; // verde
-    const colorIncorrecto = "#f44336"; // rojo
+    const colorCorrecto = "#4caf50";
+    const colorIncorrecto = "#f44336";
 
     function limpiarSeleccion() {
       celdasA.forEach(c => c.classList.remove("selected"));
@@ -121,9 +128,7 @@
     }
 
     function dibujarLinea(aId, bId, color) {
-      // Elimina línea previa si existía
       borrarLinea(aId, bId);
-
       const a = document.getElementById(aId);
       const b = document.getElementById(bId);
       const svgRect = svg.getBoundingClientRect();
@@ -141,7 +146,7 @@
       linea.setAttribute("x2", x2);
       linea.setAttribute("y2", y2);
       linea.setAttribute("stroke", color);
-      linea.setAttribute("stroke-width", "3");
+      linea.setAttribute("stroke-width", "2");
       linea.setAttribute("data-a", aId);
       linea.setAttribute("data-b", bId);
       svg.appendChild(linea);
@@ -156,7 +161,6 @@
       });
     }
 
-    // Click en celda columna A: seleccionar
     celdasA.forEach(celda => {
       celda.addEventListener("click", () => {
         limpiarSeleccion();
@@ -164,7 +168,6 @@
         seleccionA = celda;
       });
 
-      // Doble clic elimina emparejamiento asociado
       celda.addEventListener("dblclick", () => {
         for (const b in emparejamientos) {
           if (emparejamientos[b].a === celda.id) {
@@ -177,17 +180,72 @@
       });
     });
 
-    // Click en celda columna B: hacer emparejamiento con la celda A seleccionada
     celdasB.forEach(celda => {
       celda.addEventListener("click", () => {
         if (seleccionA) {
-          // Eliminar emparejamiento previo con esta B si existía
           if (emparejamientos[celda.id]) {
             borrarLinea(emparejamientos[celda.id].a, celda.id);
             delete emparejamientos[celda.id];
           }
-          // Eliminar emparejamiento previo con esta A si existía
           for (const b in emparejamientos) {
             if (emparejamientos[b].a === seleccionA.id) {
               borrarLinea(seleccionA.id, b);
-              delete emparejam
+              delete emparejamientos[b];
+            }
+          }
+
+          emparejamientos[celda.id] = { a: seleccionA.id };
+          dibujarLinea(seleccionA.id, celda.id, "gray");
+          seleccionA = null;
+          limpiarSeleccion();
+        }
+      });
+
+      celda.addEventListener("dblclick", () => {
+        if (emparejamientos[celda.id]) {
+          borrarLinea(emparejamientos[celda.id].a, celda.id);
+          delete emparejamientos[celda.id];
+        }
+      });
+    });
+
+    function verificarRespuesta() {
+      const correctos = {
+        B4: "A1",
+        B3: "A2",
+        B2: "A3",
+        B1: "A4"
+      };
+
+      let todoBien = true;
+
+      for (const [b, emp] of Object.entries(emparejamientos)) {
+        if (correctos[b] === emp.a) {
+          actualizarLineaColor(emp.a, b, colorCorrecto);
+        } else {
+          actualizarLineaColor(emp.a, b, colorIncorrecto);
+          todoBien = false;
+        }
+      }
+
+      if (Object.keys(emparejamientos).length !== 4) {
+        todoBien = false;
+      }
+
+      const mensaje = document.getElementById("mensaje");
+      mensaje.innerText = todoBien ? "¡Correcto!" : "Algunas uniones son incorrectas.";
+      mensaje.style.color = todoBien ? "limegreen" : "red";
+    }
+
+    function actualizarLineaColor(aId, bId, color) {
+      const lineas = svg.querySelectorAll("line");
+      lineas.forEach(l => {
+        if (l.getAttribute("data-a") === aId && l.getAttribute("data-b") === bId) {
+          l.setAttribute("stroke", color);
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
