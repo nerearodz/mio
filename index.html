@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #5921f3;
+      background-color: #ffffff;
       color: black;
       text-align: center;
       overflow-x: hidden;
@@ -34,7 +34,7 @@
     td {
       width: 100px;
       height: 80px;
-      background-color: #eae84f;
+      background-color: white; /* Fondo blanco */
       border: 2px solid #ccc;
       border-radius: 10px;
       font-size: 24px;
@@ -43,16 +43,12 @@
       cursor: pointer;
       user-select: none;
       position: relative;
+      transition: background-color 0.3s, border-color 0.3s;
     }
 
     td.selected {
       border: 3px solid yellow;
     }
-
-    .color1 { background-color: #4caf50 !important; } /* Verde */
-    .color2 { background-color: #f44336 !important; } /* Rojo */
-    .color3 { background-color: #ffeb3b !important; } /* Amarillo */
-    .color4 { background-color: #2196f3 !important; } /* Azul */
 
     #verify {
       margin-top: 30px;
@@ -109,19 +105,15 @@
 
   <script>
     let seleccionA = null;
-    let colorIndex = 0;
-    const colores = ["color1", "color2", "color3", "color4"];
-    const colorHex = {
-      color1: "#4caf50",  // verde
-      color2: "#f44336",  // rojo
-      color3: "#ffeb3b",  // amarillo
-      color4: "#2196f3"   // azul
-    };
     const emparejamientos = {};
     const svg = document.getElementById("lines");
 
     const celdasA = document.querySelectorAll("#colA td");
     const celdasB = document.querySelectorAll("#colB td");
+
+    // Colores para líneas: verde y rojo
+    const colorCorrecto = "#4caf50"; // verde
+    const colorIncorrecto = "#f44336"; // rojo
 
     function limpiarSeleccion() {
       celdasA.forEach(c => c.classList.remove("selected"));
@@ -129,6 +121,9 @@
     }
 
     function dibujarLinea(aId, bId, color) {
+      // Elimina línea previa si existía
+      borrarLinea(aId, bId);
+
       const a = document.getElementById(aId);
       const b = document.getElementById(bId);
       const svgRect = svg.getBoundingClientRect();
@@ -161,6 +156,7 @@
       });
     }
 
+    // Click en celda columna A: seleccionar
     celdasA.forEach(celda => {
       celda.addEventListener("click", () => {
         limpiarSeleccion();
@@ -168,73 +164,30 @@
         seleccionA = celda;
       });
 
+      // Doble clic elimina emparejamiento asociado
       celda.addEventListener("dblclick", () => {
-        const color = Array.from(celda.classList).find(c => c.startsWith("color"));
-        if (color) celda.classList.remove(color);
-
         for (const b in emparejamientos) {
           if (emparejamientos[b].a === celda.id) {
-            document.getElementById(b).classList.remove(color);
             borrarLinea(celda.id, b);
             delete emparejamientos[b];
+            limpiarSeleccion();
+            break;
           }
         }
       });
     });
 
+    // Click en celda columna B: hacer emparejamiento con la celda A seleccionada
     celdasB.forEach(celda => {
       celda.addEventListener("click", () => {
         if (seleccionA) {
-          const color = colores[colorIndex % colores.length];
-          seleccionA.classList.add(color);
-          celda.classList.add(color);
-          emparejamientos[celda.id] = { a: seleccionA.id, color };
-          dibujarLinea(seleccionA.id, celda.id, colorHex[color]);
-          colorIndex++;
-          seleccionA = null;
-          limpiarSeleccion();
-        }
-      });
-
-      celda.addEventListener("dblclick", () => {
-        const color = Array.from(celda.classList).find(c => c.startsWith("color"));
-        if (color) celda.classList.remove(color);
-
-        const emp = emparejamientos[celda.id];
-        if (emp) {
-          document.getElementById(emp.a).classList.remove(color);
-          borrarLinea(emp.a, celda.id);
-          delete emparejamientos[celda.id];
-        }
-      });
-    });
-
-    function verificarRespuesta() {
-      const correctos = {
-        B4: "A1",
-        B3: "A2",
-        B2: "A3",
-        B1: "A4"
-      };
-
-      let todoBien = true;
-      for (const [b, a] of Object.entries(correctos)) {
-        if (!emparejamientos[b] || emparejamientos[b].a !== a) {
-          todoBien = false;
-          break;
-        }
-      }
-
-      const mensaje = document.getElementById("mensaje");
-      if (todoBien && Object.keys(emparejamientos).length === 4) {
-        mensaje.innerText = "¡Correcto!";
-        mensaje.style.color = "limegreen";
-      } else {
-        mensaje.innerText = "Algunas uniones son incorrectas.";
-        mensaje.style.color = "red";
-      }
-    }
-  </script>
-
-</body>
-</html>
+          // Eliminar emparejamiento previo con esta B si existía
+          if (emparejamientos[celda.id]) {
+            borrarLinea(emparejamientos[celda.id].a, celda.id);
+            delete emparejamientos[celda.id];
+          }
+          // Eliminar emparejamiento previo con esta A si existía
+          for (const b in emparejamientos) {
+            if (emparejamientos[b].a === seleccionA.id) {
+              borrarLinea(seleccionA.id, b);
+              delete emparejam
