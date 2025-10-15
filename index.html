@@ -110,8 +110,6 @@
 
     <button id="verify" onclick="verificarRespuesta()">Verificar</button>
     <div id="mensaje"></div>
-    <!-- 👇 AÑADE ESTE BOTÓN AQUÍ -->
-<button id="continuar" style="display: none;" onclick="irAGenially()">Continuar</button>
   </div>
 
   <script>
@@ -238,10 +236,6 @@
       const mensaje = document.getElementById("mensaje");
       mensaje.innerText = todoBien ? "¡Correcto!" : "Algunas uniones son incorrectas.";
       mensaje.style.color = todoBien ? "limegreen" : "red";
-      if (todoBien) {
-      document.getElementById("continuar").style.display = "inline-block";
-        }
-
     }
 
     function actualizarLineaColor(aId, bId, color) {
@@ -252,10 +246,6 @@
         }
       });
     }
-    function irAGenially() {
-  // Reemplaza esta URL con la URL de la página siguiente de tu Genially
-  window.parent.location.href = "https://view.genially.com/68ea9faa5940cb38acfa8f83/interactive-content-ruleta-matematica/68ea9faa5940cb38acfa8f83";
-}
   </script>
 
 </body>
